@@ -8,7 +8,7 @@ CC = gcc
 all : $(PROGS)
 
 integrate : integrate.o
-	gcc -o $@ integrate.o -lmpi
+	gcc -o $@ integrate.o -lmpi -lm
 
 clean :
 	rm -f *.o $(PROGS) *~
