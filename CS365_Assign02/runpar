@@ -1,0 +1,17 @@
+#! /bin/bash
+
+filename="$1"
+numgens="$2"
+N="$3"
+M="$4"
+
+if [ -z "$filename" ] || [ -z "$numgens" ] || [ -z "$N" ] || [ -z "$M" ]; then
+	echo "Usage: ./runpar <filename> <numgens> <N> <M>"
+	exit 1
+fi
+
+numprocs=`expr $N \* $M`
+#echo "numprocs=$numprocs"
+
+mpirun --hostfile hostfile.txt -np ${numprocs} -mca btl '^openib' ./life_par \
+	$filename $numgens $N $M

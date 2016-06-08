@@ -1,0 +1,11 @@
+#! /bin/bash
+
+numprocs="$1"
+
+if [ -z "$numprocs" ]; then
+	echo "Usage: ./runpar <num processors>"
+	exit 1
+fi
+
+mpirun --hostfile hostfile.txt -np ${numprocs} -mca btl '^openib' ./hello_mpi
+

@@ -1,0 +1,12 @@
+#! /bin/bash
+
+numprocs="$1"
+
+#echo "runpar: numprocs=$numprocs"
+
+if [ -z "$numprocs" ]; then
+	echo "Usage: ./runpar <numprocs>"
+	exit 1
+fi
+
+mpirun --hostfile hostfile.txt -np ${numprocs} -mca btl '^openib' ./integrate

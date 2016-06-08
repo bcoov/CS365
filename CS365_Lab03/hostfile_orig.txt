@@ -1,0 +1,7 @@
+hitchhiker02 slots=8 max-slots=8
+hitchhiker03 slots=8 max-slots=8
+hitchhiker04 slots=8 max-slots=8
+hitchhiker05 slots=8 max-slots=8
+hitchhiker06 slots=8 max-slots=8
+hitchhiker07 slots=8 max-slots=8
+hitchhiker08 slots=8 max-slots=8

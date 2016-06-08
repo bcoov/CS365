@@ -1,0 +1,15 @@
+#! /bin/bash
+
+filename="$1"
+numgens="$2"
+numprocs="$3"
+
+#echo "runpar: numprocs=$numprocs"
+
+if [ -z "$filename" ] || [ -z "$numgens" ] || [ -z "$numprocs" ]; then
+	echo "Usage: ./runpar <filename> <numgens> <numprocs>"
+	exit 1
+fi
+
+mpirun --hostfile hostfile.txt -np ${numprocs} -mca btl '^openib' ./rule30_par \
+	$filename $numgens
