@@ -31,8 +31,14 @@ void life_compute_next_gen(Grid *grid)
 	1 -> 0 if > 3 neighbors
 	*/
 
+	/*for (int i = 0; i < grid->rows; ++i) {
+		for (int j = 0; j < grid->cols; ++j) {
 
+		}
+	}*/
 }
+
+//uint8_t life_compute_rule()
 
 void life_save_board(FILE *fp, Grid *grid)
 {
@@ -43,7 +49,7 @@ void life_save_board(FILE *fp, Grid *grid)
 		fprintf(fp, "%i", (int) grid->curr_gen[i]);
 		++count;
 
-		if (count == (grid->cols - 1)) {
+		if (count == grid->cols) {
 			fprintf(fp, "\n");
 			count = 0;
 		} else {

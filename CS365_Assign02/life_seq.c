@@ -17,7 +17,7 @@ int main(int argc, char **argv)
 
 	// read file
 	FILE *fp = fopen(filename, "r");
-	Grid *grid = life_load_board(fp, filename);
+	Grid *grid = life_load_board(fp);
 	fclose(fp);
 
 	// simulation

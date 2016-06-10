@@ -39,6 +39,19 @@ uint8_t grid_get_current(Grid *grid, int row, int col)
 	return grid->curr_gen[loc];
 }
 
+uint8_t grid_get_neighbor(Grid * grid, int row, int col)
+{
+	if (row < 0 || row >= grid->rows) {
+		return (uint8_t) 0;
+	}
+	else if (col < 0 || col >= grid->cols) {
+		return (uint8_t) 0;
+	}
+	else {
+		return grid_get_current(grid, row, col);
+	}
+}
+
 void grid_set_next(Grid *grid, int row, int col, uint8_t val)
 {
 	int loc = (row * grid->cols) + col;
