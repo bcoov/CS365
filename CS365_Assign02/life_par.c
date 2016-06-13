@@ -35,8 +35,19 @@ int main(int argc, char **argv)
 	int rank_col = rank % M;
 	int rank_row = rank / M;
 
-	// TODO: computation
+	// Create local copy
+	Grid * local = grid_alloc((N / grid->rows) + 2, (M / grid->cols) + 2);
+	for (int i = 0; i < local->rows; ++i) {
+		for (int j = 0; j < local->cols; ++j) {
+			int pos_i = (i - 1) + (local->rows * rank);
+			int pos_j = (j - 1) + (local->cols * rank);
+			uint8_t val = grid_get_current(grid, pos_i, pos_j);
+			grid_set_current(local, i, j, val);
+		}
+	}
 
+	// Local computation
+	life_compute_next_gen(local);
 
 	MPI_Finalize();
 
