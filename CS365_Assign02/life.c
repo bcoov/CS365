@@ -23,22 +23,43 @@ Grid *life_load_board(FILE *fp)
 
 void life_compute_next_gen(Grid *grid)
 {
-	/*
-	1 -> 1 if 2 or 3 neighbors
-	0 -> 1 if 3 neighbors
-	**other rules** (not included in assignment?)
-	1 -> 0 if < 2 neighbors
-	1 -> 0 if > 3 neighbors
-	*/
-
-	/*for (int i = 0; i < grid->rows; ++i) {
+	for (int i = 0; i < grid->rows; ++i) {
 		for (int j = 0; j < grid->cols; ++j) {
+			// Get values for all eight neighbors
+			uint8_t UL = grid_get_current(grid, i-1, j-1);
+			uint8_t UM = grid_get_current(grid, i-1, j);
+			uint8_t UR = grid_get_current(grid, i-1, j+1);
+			uint8_t ML = grid_get_current(grid, i, j-1);
+			uint8_t MR = grid_get_current(grid, i, j+1);
+			uint8_t BL = grid_get_current(grid, i+1, j-1);
+			uint8_t BM = grid_get_current(grid, i+1, j);
+			uint8_t BR = grid_get_current(grid, i+1, j+1);
+			uint8_t self = grid_get_current(grid, i, j);
 
+			// Find total living neighbors
+			uint8_t neighbors = (UL + UM + UR + ML + MR + BL + BM + BR);
+			// 1 -> 0 if < 2 neighbors
+			if (self == 1 && neighbors < 2) {
+				grid_set_next(grid, i, j, 0);
+			}
+			// 1 -> 1 if 2 or 3 neighbors
+			else if (self == 1 && (neighbors == 2 || neighbors == 3)) {
+				grid_set_next(grid, i, j, 1);
+			}
+			// 1 -> 0 if > 3 neighbors
+			else if (self == 1 && neighbors > 3) {
+				grid_set_next(grid, i, j, 0);
+			}
+			// 0 -> 1 if 3 neighbors
+			else if (self == 0 && neighbors == 3) {
+				grid_set_next(grid, i, j, 1);
+			}
+			else {
+				grid_set_next(grid, i, j, self);
+			}
 		}
-	}*/
+	}
 }
-
-//uint8_t life_compute_rule()
 
 void life_save_board(FILE *fp, Grid *grid)
 {

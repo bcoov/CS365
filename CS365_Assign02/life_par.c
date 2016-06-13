@@ -10,6 +10,10 @@ int main(int argc, char **argv)
 {
 	MPI_Init(&argc, &argv);
 
+	int rank, size;
+	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+	MPI_Comm_size(MPI_COMM_WORLD, &size);
+
 	if (argc != 5) {
 		fprintf(stderr, "Usage: ./runpar <filename> <numgens> <N> <M>\n");
 		exit(1);
@@ -22,7 +26,17 @@ int main(int argc, char **argv)
 
 	printf("filename=%s, numgens=%i, N=%i, M=%i\n", filename, numgens, N, M);
 
+	// read file
+	FILE * fp = fopen(filename, "r");
+	Grid * grid = life_load_board(fp);
+	fclose(fp);
+
+	// Split per process
+	int rank_col = rank % M;
+	int rank_row = rank / M;
+
 	// TODO: computation
+
 
 	MPI_Finalize();
 

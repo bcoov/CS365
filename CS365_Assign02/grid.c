@@ -32,15 +32,10 @@ void grid_flip(Grid *grid)
 	grid->curr_gen = grid->next_gen;
 	grid->next_gen = flip;
 }
-
+ 
 uint8_t grid_get_current(Grid *grid, int row, int col)
 {
-	int loc = (row * grid->cols) + col;
-	return grid->curr_gen[loc];
-}
-
-uint8_t grid_get_neighbor(Grid * grid, int row, int col)
-{
+	// If given location is out of bounds, consider cell as "dead"
 	if (row < 0 || row >= grid->rows) {
 		return (uint8_t) 0;
 	}
@@ -48,8 +43,15 @@ uint8_t grid_get_neighbor(Grid * grid, int row, int col)
 		return (uint8_t) 0;
 	}
 	else {
-		return grid_get_current(grid, row, col);
+		int loc = (row * grid->cols) + col;
+		return grid->curr_gen[loc];
 	}
+}
+
+void grid_set_current(Grid * grid, int row, int col, uint8_t val)
+{
+	int loc = (row * grid->cols) + col;
+	grid->curr_gen[loc] = val;
 }
 
 void grid_set_next(Grid *grid, int row, int col, uint8_t val)

@@ -35,7 +35,11 @@ void grid_flip(Grid *grid);
 //
 uint8_t grid_get_current(Grid *grid, int row, int col);
 
-uint8_t grid_get_neighbor(Grid * grid, int row, int col);
+//
+// Set the value stored in given row and column of the current
+// generation of the given Grid.
+//
+void grid_set_current(Grid * grid, int row, int col, uint8_t val);
 
 //
 // Set the value stored in given row and column of the next
