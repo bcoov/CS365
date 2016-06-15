@@ -6,6 +6,11 @@
 #include "grid.h"
 #include "life.h"
 
+static void send_col(Grid * grid, int col, int dest);
+static void recv_col(Grid * grid, int col, int src);
+static void send_row(Grid * grid, int row, int dest);
+static void recv_row(Grid * grid, int row, int src);
+
 int main(int argc, char **argv)
 {
 	MPI_Init(&argc, &argv);
@@ -46,10 +51,50 @@ int main(int argc, char **argv)
 		}
 	}
 
-	// Local computation
-	life_compute_next_gen(local);
+	for (int i = 0; i <= numgens; ++i) {
+		// Local computation
+		life_compute_next_gen(local);
+
+		// Send stuff?
+
+		grid_flip(local);
+
+		life_save_board(stdout, local);
+	}
 
 	MPI_Finalize();
 
 	return 0;
 }
+
+static void send_col(Grid * grid, int col, int dest) {
+	for (int i = 1; i < grid->rows - 1; ++i) {
+		uint8_t cell = grid_get_current(grid, i, col);
+		MPI_Send(&cell, 1, MPI_CHAR, dest, 0, MPI_COMM_WORLD);
+	}
+}
+
+static void recv_col(Grid * grid, int col, int src) {
+	for (int i = 1; i < grid->rows - 1; ++i) {
+		uint8_t cell;
+		MPI_Recv(&cell, 1, MPI_CHAR, src, 0, MPI_COMM_WORLD, NULL);
+		grid_set_current(grid, i, col, cell);
+	}
+}
+
+static void send_row(Grid * grid, int row, int dest) {
+	for (int i = 1; i < grid->cols - 1; ++i) {
+		uint8_t cell;
+		MPI_Send(&cell, 1, MPI_CHAR, dest, 0, MPI_COMM_WORLD);
+	}
+}
+
+static void recv_row(Grid * grid, int row, int src) {
+	for (int i = 1; i < grid->cols - 1; ++i) {
+		uint8_t cell;
+		MPI_Recv(&cell, 1, MPI_CHAR, src, 0, MPI_COMM_WORLD, NULL);
+		grid_set_current(grid, row, i, cell);
+	}
+}
+
+//static void 
