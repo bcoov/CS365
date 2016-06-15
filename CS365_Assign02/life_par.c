@@ -39,6 +39,7 @@ int main(int argc, char **argv)
 	// Split per process
 	int rank_col = rank % M;
 	int rank_row = rank / M;
+	printf("Rank %d has %d cols and %d rows\n", rank, rank_col, rank_row);
 
 	// Create local copy
 	Grid * local = grid_alloc((N / grid->rows) + 2, (M / grid->cols) + 2);
@@ -51,7 +52,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	for (int i = 0; i <= numgens; ++i) {
+	for (int i = 0; i < numgens; ++i) {
 		// Local computation
 		life_compute_next_gen(local);
 
@@ -59,7 +60,8 @@ int main(int argc, char **argv)
 
 		grid_flip(local);
 
-		life_save_board(stdout, local);
+		printf("Rank: %d\n", rank);
+		life_save_board(stdout, grid);
 	}
 
 	MPI_Finalize();
