@@ -22,7 +22,7 @@ int main(int argc, char **argv)
 
 	// simulation
 	for (int i = 0; i < numgens; i++) {
-		life_compute_next_gen(grid);
+		life_compute_next_gen(grid, 0, 0);
 		grid_flip(grid);
 	}
 

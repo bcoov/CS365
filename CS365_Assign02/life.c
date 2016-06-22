@@ -21,10 +21,10 @@ Grid *life_load_board(FILE *fp)
 	return grid;
 }
 
-void life_compute_next_gen(Grid *grid)
+void life_compute_next_gen(Grid *grid, int offset_start, int offset_end)
 {
-	for (int i = 0; i < grid->rows; ++i) {
-		for (int j = 0; j < grid->cols; ++j) {
+	for (int i = 0 + offset_start; i < grid->rows - offset_end; ++i) {
+		for (int j = 0 + offset_start; j < grid->cols - offset_end; ++j) {
 			// Get values for all eight neighbors
 			uint8_t UL = grid_get_current(grid, i-1, j-1);
 			uint8_t UM = grid_get_current(grid, i-1, j);

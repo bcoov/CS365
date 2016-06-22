@@ -20,7 +20,10 @@ Grid *life_load_board(FILE *fp);
 // In given Grid, compute the next generation based on the
 // current generation.
 //
-void life_compute_next_gen(Grid *grid);
+// offset_start and offset_end give the option to "ignore" a number
+// of rows/cols (equally), such as in parallell implementations.
+//
+void life_compute_next_gen(Grid *grid, int offset_start, int offset_end);
 
 //
 // Save the contents of the current generation of the given Grid
