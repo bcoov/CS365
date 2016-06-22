@@ -1,3 +1,5 @@
 *.o
-./*/life_par
+./CS365_Assign02/life_par
+./CS365_Assign02/life_seq
+./CS365_Assign02/testgrid
 
