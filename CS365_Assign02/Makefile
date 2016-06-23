@@ -2,7 +2,7 @@ CFLAGS = -g -Wall -std=gnu99 -D_REENTRANT -I/usr/include/openmpi
 
 SUBMIT_URL = https://cs.ycp.edu/marmoset/bluej/SubmitProjectViaBlueJSubmitter
 COURSE_NAME = CS 365
-SEMESTER = Spring 2015
+SEMESTER = Summer 2016
 
 TESTSRCS = testgrid.c tctest.c
 SRCS = grid.c life.c

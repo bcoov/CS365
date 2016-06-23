@@ -93,10 +93,10 @@ int main(int argc, char **argv)
 		if (rank_col != M - 1) {
 			// send column right
 			int right_n = rank + 1;
-			send_col(local, local->rows - 2, right_n);
+			send_col(local, local->cols - 2, right_n);
 
 			// receive from right
-			recv_col(local, local->rows - 1, right_n);
+			recv_col(local, local->cols - 1, right_n);
 		}
 
 		// Row sending is acting strangely. A row appears to be "stolen"
@@ -138,16 +138,16 @@ int main(int argc, char **argv)
 			send_row(local, 1, top_n);
 
 			// receive from top
-			recv_col(local, 0, top_n);
+			recv_row(local, 0, top_n);
 		}
 		// Bottom Neighbour
 		if (rank_row != N - 1) {
 			// send row down
 			int bot_n = rank + M;
-			send_row(local, local->cols - 2, bot_n);
+			send_row(local, local->rows - 2, bot_n);
 
 			// receive from bottom
-			recv_row(local, local->cols - 1, bot_n);
+			recv_row(local, local->rows - 1, bot_n);
 		}
 
 		// Local computation
