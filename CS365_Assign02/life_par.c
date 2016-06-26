@@ -118,33 +118,36 @@ int main(int argc, char **argv)
 		if (rank_row != 0 && rank_col != 0) {
 			// Send corner cell
 			uint8_t to_send = grid_get_current(local, 1, 1);
-			MPI_Send(&to_send, 1, MPI_CHAR, dest, 0, MPI_COMM_WORLD);
+			int corner = rank - M - 1;
+			MPI_Send(&to_send, 1, MPI_CHAR, corner, 0, MPI_COMM_WORLD);
 
 			// Receive corner cell
 			uint8_t val;
-			MPI_Recv(&val, 1, MPI_CHAR, src, 0, MPI_COMM_WORLD, NULL);
+			MPI_Recv(&val, 1, MPI_CHAR, corner, 0, MPI_COMM_WORLD, NULL);
 			grid_set_current(local, 0, 0, val);
 		}
 		// Top-Right Corner
 		if (rank_row != 0 && rank_col != M - 1) {
 			// Send corner cell
 			uint8_t to_send = grid_get_current(local, 1, local->cols - 2);
-			MPI_Send(&to_send, 1, MPI_CHAR, dest, 0, MPI_COMM_WORLD);
+			int corner = rank - M + 1;
+			MPI_Send(&to_send, 1, MPI_CHAR, corner, 0, MPI_COMM_WORLD);
 
 			// Receive corner cell
 			uint8_t val;
-			MPI_Recv(&val, 1, MPI_CHAR, src, 0, MPI_COMM_WORLD, NULL);
+			MPI_Recv(&val, 1, MPI_CHAR, corner, 0, MPI_COMM_WORLD, NULL);
 			grid_set_current(local, 0, local->cols - 1, val);
 		}
 		// Bottom-Left Corner
 		if (rank_row != N - 1 && rank_col != 0) {
 			// Send corner cell
 			uint8_t to_send = grid_get_current(local, local->rows - 2, 0);
-			MPI_Send(&to_send, 1, MPI_CHAR, dest, 0, MPI_COMM_WORLD);
+			int corner = rank + M - 1;
+			MPI_Send(&to_send, 1, MPI_CHAR, corner, 0, MPI_COMM_WORLD);
 
 			// Receive corner cell
 			uint8_t val;
-			MPI_Recv(&val, 1, MPI_CHAR, src, 0, MPI_COMM_WORLD, NULL);
+			MPI_Recv(&val, 1, MPI_CHAR, corner, 0, MPI_COMM_WORLD, NULL);
 			grid_set_current(local, local->rows - 1, 0, val);
 		}
 		// Bottom-Right Corner
@@ -153,11 +156,12 @@ int main(int argc, char **argv)
 			uint8_t to_send = grid_get_current(local,
 											   local->rows - 2,
 											   local->cols - 2);
-			MPI_Send(&to_send, 1, MPI_CHAR, dest, 0, MPI_COMM_WORLD);
+			int corner = rank + M + 1;
+			MPI_Send(&to_send, 1, MPI_CHAR, corner, 0, MPI_COMM_WORLD);
 
 			// Receive corner cell
 			uint8_t val;
-			MPI_Recv(&val, 1, MPI_CHAR, src, 0, MPI_COMM_WORLD, NULL);
+			MPI_Recv(&val, 1, MPI_CHAR, corner, 0, MPI_COMM_WORLD, NULL);
 			grid_set_current(local, local->rows - 1, local->cols - 1, val);
 		}
 
@@ -172,7 +176,7 @@ int main(int argc, char **argv)
 	fflush(stdout);
 
 	// Global reconstruction
-	
+
 
 	MPI_Finalize();
 
