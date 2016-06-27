@@ -58,23 +58,19 @@ int main(int argc, char **argv)
 
 	// Create local copy
 	Grid * local = grid_alloc(height, width);
-	// for (int i = 0; i < local->rows; ++i) {
-	// 	for (int j = 0; j < local->cols; ++j) {
 	for (int i = 1, pos_i = v_chunk_size*rank_row;
 		 i < local->rows-1; ++i, ++pos_i) {
 		for (int j = 1, pos_j = h_chunk_size*rank_col;
 			 j < local->cols-1; ++j, ++pos_j) {
-			// int pos_i = (i - 1) + (local->rows * rank);
-			// int pos_j = (j - 1) + (local->cols * rank);
 			uint8_t val = grid_get_current(grid, pos_i, pos_j);
 			grid_set_current(local, i, j, val);
 		}
 	}
 
-	sleep(rank);
-	printf("Rank: %d\n", rank);
-	life_save_board(stdout, local);
-	fflush(stdout);
+	// sleep(rank);
+	// printf("Rank: %d\n", rank);
+	// life_save_board(stdout, local);
+	// fflush(stdout);
 	for (int i = 0; i < numgens; ++i) {
 		// Communications
 		// Left Neighbour
@@ -128,38 +124,32 @@ int main(int argc, char **argv)
 		}
 		// Top-Right Corner
 		if (rank_row != 0 && rank_col != M - 1) {
-			// Send corner cell
 			uint8_t to_send = grid_get_current(local, 1, local->cols - 2);
 			int corner = rank - M + 1;
 			MPI_Send(&to_send, 1, MPI_CHAR, corner, 0, MPI_COMM_WORLD);
 
-			// Receive corner cell
 			uint8_t val;
 			MPI_Recv(&val, 1, MPI_CHAR, corner, 0, MPI_COMM_WORLD, NULL);
 			grid_set_current(local, 0, local->cols - 1, val);
 		}
 		// Bottom-Left Corner
 		if (rank_row != N - 1 && rank_col != 0) {
-			// Send corner cell
 			uint8_t to_send = grid_get_current(local, local->rows - 2, 0);
 			int corner = rank + M - 1;
 			MPI_Send(&to_send, 1, MPI_CHAR, corner, 0, MPI_COMM_WORLD);
 
-			// Receive corner cell
 			uint8_t val;
 			MPI_Recv(&val, 1, MPI_CHAR, corner, 0, MPI_COMM_WORLD, NULL);
 			grid_set_current(local, local->rows - 1, 0, val);
 		}
 		// Bottom-Right Corner
 		if (rank_row != N - 1 && rank_col != M - 1) {
-			// Send corner cell
 			uint8_t to_send = grid_get_current(local,
 											   local->rows - 2,
 											   local->cols - 2);
 			int corner = rank + M + 1;
 			MPI_Send(&to_send, 1, MPI_CHAR, corner, 0, MPI_COMM_WORLD);
 
-			// Receive corner cell
 			uint8_t val;
 			MPI_Recv(&val, 1, MPI_CHAR, corner, 0, MPI_COMM_WORLD, NULL);
 			grid_set_current(local, local->rows - 1, local->cols - 1, val);
@@ -170,15 +160,30 @@ int main(int argc, char **argv)
 
 		grid_flip(local);
 	}
-	sleep(rank);
-	printf("Rank: %d (After)\n", rank);
-	life_save_board(stdout, local);
-	fflush(stdout);
+	// sleep(rank);
+	// printf("Rank: %d (After)\n", rank);
+	// life_save_board(stdout, local);
+	// fflush(stdout);
 
 	// Global reconstruction
-
+	for (int i = 1, pos_i = v_chunk_size*rank_row;
+		 i < local->rows-1; ++i, ++pos_i) {
+		for (int j = 1, pos_j = h_chunk_size*rank_col;
+			 j < local->cols-1; ++j, ++pos_j) {
+			//printf("local[%d,%d] -> grid[%d,%d] (rank: %d)\n", i, j, pos_i, pos_j, rank);
+			//fflush(stdout);
+			uint8_t val = grid_get_current(local, i, j);
+			grid_set_current(grid, pos_i, pos_j, val);
+		}
+	}
 
 	MPI_Finalize();
+
+	if (rank == 0){
+		printf("Final state:\n");
+		life_save_board(stdout, grid);
+		fflush(stdout);
+	}
 
 	return 0;
 }
