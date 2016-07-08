@@ -67,10 +67,10 @@ int main(int argc, char **argv)
 		}
 	}
 
-	sleep(rank);
-	printf("Rank: %d\n", rank);
-	life_save_board(stdout, local);
-	fflush(stdout);
+	// sleep(rank);
+	// printf("Rank: %d\n", rank);
+	// life_save_board(stdout, local);
+	// fflush(stdout);
 	for (int i = 0; i < numgens; ++i) {
 		// Communications
 		// Left Neighbour
@@ -160,10 +160,10 @@ int main(int argc, char **argv)
 
 		grid_flip(local);
 	}
-	sleep(rank);
-	printf("Rank: %d (After)\n", rank);
-	life_save_board(stdout, local);
-	fflush(stdout);
+	// sleep(rank);
+	// printf("Rank: %d (After)\n", rank);
+	// life_save_board(stdout, local);
+	// fflush(stdout);
 
 	// Non-root processes: let the root process know how many
 	// data values will be sent
@@ -196,8 +196,16 @@ int main(int argc, char **argv)
 		for (int proc = 1; proc < size; proc++) {
 			int cells_to_recv;
 			// call to MPI_Recv
+			MPI_Recv(&cells_to_recv, 1, MPI_INT, proc, 0, MPI_COMM_WORLD, NULL);
 			for (int i = 0; i < cells_to_recv; i++) {
 				// three calls to MPI_Recv, one call to grid_set_current
+				int set_i, set_j;
+				uint8_t set_val;
+				MPI_Recv(&set_i, 1, MPI_INT, proc, 0, MPI_COMM_WORLD, NULL);
+				MPI_Recv(&set_j, 1, MPI_INT, proc, 0, MPI_COMM_WORLD, NULL);
+				MPI_Recv(&set_val, 1, MPI_CHAR, proc, 0, MPI_COMM_WORLD, NULL);
+
+				grid_set_current(grid, set_i, set_j, set_val);
 			}
 		}
 	}
