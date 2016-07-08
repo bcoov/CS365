@@ -134,7 +134,7 @@ int main(int argc, char **argv)
 		}
 		// Bottom-Left Corner
 		if (rank_row != N - 1 && rank_col != 0) {
-			uint8_t to_send = grid_get_current(local, local->rows - 2, 0);
+			uint8_t to_send = grid_get_current(local, local->rows - 2, 1);
 			int corner = rank + M - 1;
 			MPI_Send(&to_send, 1, MPI_CHAR, corner, 0, MPI_COMM_WORLD);
 
