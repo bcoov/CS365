@@ -16,7 +16,7 @@ struct t_parts {
 	uint64_t t_sum;
 };
 
-struct t_parts some_threads[1];
+// struct t_parts some_threads[1];
 
 void * thread_sum(void * t_arg)
 {
@@ -37,7 +37,7 @@ int main(int argc, char **argv)
 	uint64_t sum;
 	struct mmap_region region;
 
-	// struct t_parts t0_data;
+	struct t_parts t0_data;
 	pthread_t thread0;
 	size_t chunk;
 
@@ -62,12 +62,18 @@ int main(int argc, char **argv)
 	// Compute the sum
 	sum = 0ULL;
 
-	some_threads[0].t_data = data;
-	some_threads[0].start = chunk + (size_t) 1;
-	some_threads[0].end = some_threads[0].start + chunk;
-	some_threads[0].t_sum = sum;
+	// some_threads[0].t_data = data;
+	// some_threads[0].start = chunk + (size_t) 1;
+	// some_threads[0].end = some_threads[0].start + chunk;
+	// some_threads[0].t_sum = sum;
 
-	pthread_create(&thread0, NULL, thread_sum, (void *) some_threads[0]);
+	t0_data.t_data = data;
+	t0_data.start = chunk + (size_t) 1;
+	t0_data.end = t0_data.start + chunk;
+	t0_data.t_sum = sum;
+
+	// pthread_create(&thread0, NULL, thread_sum, (void *) some_threads[0]);
+	pthread_create(&thread0, NULL, thread_sum, &t0_data);
 
 	// for (i = 0; i < num_elements; i++) {
 	for (i = 0; i < chunk; i++) {
@@ -76,7 +82,8 @@ int main(int argc, char **argv)
 
 	pthread_join(&thread0, NULL);
 
-	sum += some_threads[0].t_sum;
+	// sum += some_threads[0].t_sum;
+	sum += t0_data.t_sum;
 
 	printf("Sum is %lu\n", sum);
 
