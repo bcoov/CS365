@@ -30,7 +30,7 @@ int main(int argc, char **argv)
 	int N = atoi(argv[3]);  // number of rows of processes
 	int M = atoi(argv[4]);  // number of columns of processes
 
-	printf("filename=%s, numgens=%i, N=%i, M=%i\n", filename, numgens, N, M);
+	// printf("filename=%s, numgens=%i, N=%i, M=%i\n", filename, numgens, N, M);
 
 	// read file
 	FILE * fp = fopen(filename, "r");
