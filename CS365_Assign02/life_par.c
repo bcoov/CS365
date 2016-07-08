@@ -213,7 +213,7 @@ int main(int argc, char **argv)
 	MPI_Finalize();
 
 	if (rank == 0){
-		printf("Final state:\n");
+		//printf("Final state:\n");
 		life_save_board(stdout, grid);
 		fflush(stdout);
 	}
