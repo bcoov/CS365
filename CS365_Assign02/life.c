@@ -71,7 +71,7 @@ void life_save_board(FILE *fp, Grid *grid)
 		++count;
 
 		if (count == grid->cols) {
-			fprintf(fp, "\n");
+			fprintf(fp, " \n");
 			count = 0;
 		} else {
 			fprintf(fp, " ");

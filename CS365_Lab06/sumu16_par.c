@@ -20,7 +20,8 @@ struct t_parts {
 
 void * thread_sum(void * t_arg)
 {
-	printf("Starting thread_sum\n");
+	struct t_parts *t_data = t_arg;
+	printf("Starting thread_sum: %lu..%lu\n", t_data->start, t_data->end);
 
 	struct t_parts * thread_data = (struct t_parts *) t_arg;
 	for (size_t i = thread_data->start; i < thread_data->end; ++i) {
@@ -29,6 +30,8 @@ void * thread_sum(void * t_arg)
 
 	pthread_exit(NULL);
 }
+
+#define NUMTHREADS 1
 
 int main(int argc, char **argv)
 {
@@ -40,6 +43,12 @@ int main(int argc, char **argv)
 	struct t_parts t0_data;
 	pthread_t thread0;
 	size_t chunk;
+
+	/*
+	// To support multiple threads...
+	pthread_t threads[NUMTHREADS];
+	struct t_parts data[NUMTHREADS];
+	*/
 
 	if (argc != 2) {
 		fprintf(stderr, "Usage: sumu16 <input file>\n");
@@ -68,7 +77,7 @@ int main(int argc, char **argv)
 	// some_threads[0].t_sum = sum;
 
 	t0_data.t_data = data;
-	t0_data.start = chunk + (size_t) 1;
+	t0_data.start = chunk /*+ (size_t) 1*/;
 	t0_data.end = t0_data.start + chunk;
 	t0_data.t_sum = sum;
 
@@ -80,7 +89,7 @@ int main(int argc, char **argv)
 		sum += data[i];
 	}
 
-	pthread_join(&thread0, NULL);
+	pthread_join(thread0, NULL);
 
 	// sum += some_threads[0].t_sum;
 	sum += t0_data.t_sum;
