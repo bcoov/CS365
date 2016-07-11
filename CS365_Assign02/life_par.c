@@ -243,7 +243,7 @@ static void send_row(Grid * grid, int row, int dest) {
 	// }
 
 	int num_cells = grid->cols - 2;
-	uint8_t * to_send[num_cells];
+	uint8_t * to_send = (uint8_t *) malloc(sizeof(uint8_t) * num_cells);
 	for (int i = 1; i < grid->cols - 1; ++i) {
 		to_send[i - 1] = grid_get_current(grid, row, i);
 	}
@@ -258,7 +258,7 @@ static void recv_row(Grid * grid, int row, int src) {
 	// }
 
 	int num_cells = grid->cols - 2;
-	uint8_t * to_save[num_cells];
+	uint8_t * to_save = (uint8_t *) malloc(sizeof(uint8_t) * num_cells);
 	MPI_Recv(&to_save, num_cells, MPI_CHAR, src, 0, MPI_COMM_WORLD, NULL);
 	for (int i = 1; i < grid->cols - 1; ++i) {
 		grid_set_current(grid, row, i, to_save[i - 1]);
