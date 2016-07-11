@@ -259,7 +259,7 @@ static void recv_row(Grid * grid, int row, int src) {
 
 	int num_cells = grid->cols - 2;
 	uint8_t * to_save[num_cells];
-	MPI_Recv(&cell, 1, MPI_CHAR, src, 0, MPI_COMM_WORLD, NULL);
+	MPI_Recv(&to_save, 1, MPI_CHAR, src, 0, MPI_COMM_WORLD, NULL);
 	for (int i = 1; i < grid->cols - 1; ++i) {
 		grid_set_current(grid, row, i, to_save[i - 1]);
 	}
