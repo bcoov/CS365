@@ -237,16 +237,30 @@ static void recv_col(Grid * grid, int col, int src) {
 }
 
 static void send_row(Grid * grid, int row, int dest) {
+	// for (int i = 1; i < grid->cols - 1; ++i) {
+	// 	uint8_t cell = grid_get_current(grid, row, i);
+	// 	MPI_Send(&cell, 1, MPI_CHAR, dest, 0, MPI_COMM_WORLD);
+	// }
+
+	int num_cells = grid->cols - 2;
+	uint8_t * to_send[num_cells];
 	for (int i = 1; i < grid->cols - 1; ++i) {
-		uint8_t cell = grid_get_current(grid, row, i);
-		MPI_Send(&cell, 1, MPI_CHAR, dest, 0, MPI_COMM_WORLD);
+		to_send[i - 1] = grid_get_current(grid, row, i);
 	}
+	MPI_Send(&to_send, num_cells, MPI_CHAR, dest, 0, MPI_COMM_WORLD);
 }
 
 static void recv_row(Grid * grid, int row, int src) {
+	// for (int i = 1; i < grid->cols - 1; ++i) {
+	// 	uint8_t cell;
+	// 	MPI_Recv(&cell, 1, MPI_CHAR, src, 0, MPI_COMM_WORLD, NULL);
+	// 	grid_set_current(grid, row, i, cell);
+	// }
+
+	int num_cells = grid->cols - 2;
+	uint8_t * to_save[num_cells];
+	MPI_Recv(&cell, 1, MPI_CHAR, src, 0, MPI_COMM_WORLD, NULL);
 	for (int i = 1; i < grid->cols - 1; ++i) {
-		uint8_t cell;
-		MPI_Recv(&cell, 1, MPI_CHAR, src, 0, MPI_COMM_WORLD, NULL);
-		grid_set_current(grid, row, i, cell);
+		grid_set_current(grid, row, i, to_save[i - 1]);
 	}
 }
