@@ -7,8 +7,7 @@
 typedef struct {
 	int capacity, num_found;
 	int *data;
-
-	// TODO: add a mutex for synchronization
+	pthread_mutex_t lock;
 } PrimeList ;
 
 // Create a PrimeList with enough capacity to store given
@@ -20,7 +19,7 @@ PrimeList *primelist_alloc(int capacity)
 	list->num_found = 0;
 	list->data = malloc(capacity * sizeof(int));
 
-	// TODO: initialize the mutex
+	pthread_mutex_init(&list->lock, NULL);
 
 	return list;
 }
@@ -31,7 +30,14 @@ PrimeList *primelist_alloc(int capacity)
 // (the code that will access the PrimeList's fields).
 void primelist_append(PrimeList *list, int prime)
 {
-	// TODO
+	pthread_mutex_lock(&list->lock);
+
+	list->data[list->num_found] = prime;
+	++list->num_found;
+
+	pthread_mutex_unlock(&list->lock);
+
+	return;
 }
 
 int main(void)
