@@ -104,6 +104,7 @@ int main(void)
 	for (int i = 0; i < list->num_found; i++) {
 		printf("%d ", list->data[i]);
 	}
+	printf("\n");
 
 	return 0;
 }
