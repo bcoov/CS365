@@ -100,8 +100,9 @@ int main(void)
 	}
 
 	// Print out all primes found in range (once all threads have completed)
+	printf("Total primes found: %d\n", list->num_found);
 	for (int i = 0; i < list->num_found; i++) {
-		printf("Prime %d: %d\n", i, list->data[i]);
+		printf("%d ", list->data[i]);
 	}
 
 	return 0;
