@@ -42,7 +42,7 @@ void *mtqueue_dequeue(MTQueue *q)
 
     pthread_mutex_unlock(&q->lock);
 
-    return to_remove;
+    return to_remove->item;
 }
 
 void mtqueue_wait_until_empty(MTQueue *q)
