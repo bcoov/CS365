@@ -48,7 +48,7 @@ void primelist_append(PrimeList *list, int prime)
 
 void * find_primes(void * t_arg)
 {
-	ThreadWork * t_work = (ThreadWork) t_arg;
+	ThreadWork * t_work = t_arg;
 
 	for (int i = t_work->start; i < t_work->end; i++) {
 		if (is_prime(i)) {
@@ -87,7 +87,7 @@ int main(void)
 
 	for (int t = 0; t < num_threads; t++) {
 		workers[t].work_list = list;
-		workers[t].start = min + (i * chunk_size);
+		workers[t].start = min + (t * chunk_size);
 		workers[t].end = workers[t].start + chunk_size;
 		if (t == num_threads - 1) {
 			workers[t].end += leftover;
