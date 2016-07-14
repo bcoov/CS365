@@ -11,7 +11,8 @@ typedef struct MTQueueNode_ {
 typedef struct {
 	MTQueueNode *head, *tail;
 
-	// TODO: add mutex and condition variable(s)
+    pthread_mutex_t lock;
+    pthread_cond_t cond;
 } MTQueue;
 
 MTQueue *mtqueue_create(void);
