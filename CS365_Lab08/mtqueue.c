@@ -17,7 +17,7 @@ MTQueue *mtqueue_create(void)
 
 void mtqueue_enqueue(MTQueue *q, void *item)
 {
-	MTQueueNode_ * new_node = malloc(sizeof(MTQueueNode_));
+	MTQueueNode * new_node = malloc(sizeof(MTQueueNode));
     new_node->item = item;
     new_node->next = NULL;
 
@@ -36,7 +36,7 @@ void *mtqueue_dequeue(MTQueue *q)
 
     pthread_mutex_lock(&q->lock);
 
-    MTQueueNode_ * to_remove = q->head;
+    MTQueueNode * to_remove = q->head;
     q->head = q->head->next;
     free(q->head);
 
