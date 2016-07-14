@@ -10,6 +10,12 @@ typedef struct {
 	pthread_mutex_t lock;
 } PrimeList ;
 
+typedef struct {
+	PrimeList * work_list;
+	int start;
+	int end;
+} ThreadWork;
+
 // Create a PrimeList with enough capacity to store given
 // number of primes.
 PrimeList *primelist_alloc(int capacity)
@@ -40,6 +46,19 @@ void primelist_append(PrimeList *list, int prime)
 	return;
 }
 
+void * find_primes(void * t_arg)
+{
+	ThreadWork * t_work = (ThreadWork) t_arg;
+
+	for (int i = t_work->start; i < t_work->end; i++) {
+		if (is_prime(i)) {
+			primelist_append(t_work->work_list, i);
+		}
+	}
+
+	pthread_exit(NULL);
+}
+
 int main(void)
 {
 	int min, max;
@@ -58,9 +77,32 @@ int main(void)
 	// Use this data structure to store all of the primes discovered
 	PrimeList *list = primelist_alloc(est_num_primes);
 
-	// TODO: use threads to find all primes in range, add them to the PrimeList
+	// Use threads to find all primes in range, add them to the PrimeList
+	pthread_t threads[num_threads];
+	ThreadWork workers[num_threads];
 
-	// TODO: print out all primes found in range (once all threads have completed)
+	int range = (max - min) + 1;
+	int chunk_size = range / num_threads;
+	int leftover = range % num_threads;
+
+	for (int t = 0; t < num_threads; t++) {
+		workers[t].work_list = list;
+		workers[t].start = min + (i * chunk_size);
+		workers[t].end = workers[t].start + chunk_size;
+		if (t == num_threads - 1) {
+			workers[t].end += leftover;
+		}
+		pthread_create(&threads[t], NULL, find_primes, &workers[t]);
+	}
+
+	for (int t = 0; t < num_threads; t++) {
+		pthread_join(threads[t], NULL);
+	}
+
+	// Print out all primes found in range (once all threads have completed)
+	for (int i = 0; i < list->num_found; i++) {
+		printf("Prime %d: %d\n", i, list->data[i]);
+	}
 
 	return 0;
 }
