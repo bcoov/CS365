@@ -27,6 +27,9 @@
 #define WIDTH 10000.0
 #define HEIGHT 10000.0
 
+#define NUM_THREADS 4
+pthread_t * workers;
+
 // Struct type representing a single particle
 typedef struct {
 	double x, y;
@@ -39,6 +42,10 @@ typedef struct {
 typedef struct {
 	Particle *particles;
 	int num_particles;
+
+	// Thread struct members
+	pthread_mutex_t lock;
+	pthread_cond_t cond;
 } NBody;
 
 // ----------------------------------------------------------------------
@@ -113,6 +120,9 @@ void nbody_init(NBody *sim)
 	for (int i = 0; i < NUM; i++) {
 		particle_init_rand(&sim->particles[i]);
 	}
+
+	pthread_mutex_init(&sim->lock, NULL);
+	pthread_cond_init(&sim->cond, NULL);
 }
 
 void nbody_destroy(NBody *sim)
