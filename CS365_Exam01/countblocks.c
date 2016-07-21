@@ -64,16 +64,57 @@ int main(int argc, char **argv)
 
 	int global_num_rows = global->rows;
 	int global_num_cols = global->cols;
+	int global_count;
 
 	// TODO: have this process determine its region of the global Grid
 	int proc_row = rank / M; // which row of processes is this process in
 	int proc_col = rank % M; // which column of processes is this process in
 
+	int p_rows = global_num_rows / N;
+	int p_cols = global_num_cols / M;
+
+	int pr_start = 0 + (p_rows * proc_row);
+	int pc_start = 0 + (p_cols * proc_col);
+
+	// Add excess once starting point is found
+	if (proc_row == N - 1) {
+		p_rows += global_num_rows % N;
+	}
+	if (proc_col == M - 1) {
+		p_cols += global_num_cols % M;
+	}
+
+	int pr_end = pr_start + p_rows;
+	int pc_end = pc_start + p_cols;
+
 	// TODO: local computation: count how many 3x3 blocks in this
 	// process's region sum to q
+	uint8_t p_count = 0;
+
+	for (int row = pr_start; row < pr_end - 2; row++) {
+		for (int col = pc_start; col < pc_end - 2; col++) {
+			uint8_t UL = grid_get_current(global, row, col);
+			uint8_t UM = grid_get_current(global, row, col + 1);
+			uint8_t UR = grid_get_current(global, row, col + 2);
+			uint8_t ML = grid_get_current(global, row + 1, col);
+			uint8_t MM = grid_get_current(global, row + 1, col + 1);
+			uint8_t MR = grid_get_current(global, row + 1, col + 2);
+			uint8_t BL = grid_get_current(global, row + 2, col);
+			uint8_t BM = grid_get_current(global, row + 2, col + 1);
+			uint8_t BR = grid_get_current(global, row + 2, col + 2);
+
+			uint8_t total = (UL + UM + UR +
+							 ML + MM + MR +
+							 BL + BM + BR);
+			if (total == q) {
+				p_count++;
+			}
+		}
+	}
 
 	// TODO: reduce all of the local results to a single
 	// overall result, report it (hint: MPI_Reduce)
+	MPI_Reduce(&p_count, &global_count, 1, MPI_INTEGER, NULL, 0, MPI_COMM_WORLD);
 
 	MPI_Finalize();
 
