@@ -64,7 +64,7 @@ int main(int argc, char **argv)
 
 	int global_num_rows = global->rows;
 	int global_num_cols = global->cols;
-	int global_count;
+	uint8_t global_count;
 
 	// TODO: have this process determine its region of the global Grid
 	int proc_row = rank / M; // which row of processes is this process in
