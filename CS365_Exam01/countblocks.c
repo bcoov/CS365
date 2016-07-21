@@ -87,6 +87,9 @@ int main(int argc, char **argv)
 	int pr_end = pr_start + p_rows;
 	int pc_end = pc_start + p_cols;
 
+	printf("Start: %d, End: %d; (Rank: %d)\n", pr_start, pr_end, rank);
+	printf("Start: %d, End: %d; (Rank: %d)\n", pc_start, pc_end, rank);
+
 	// TODO: local computation: count how many 3x3 blocks in this
 	// process's region sum to q
 	uint8_t p_count = 0;
@@ -106,15 +109,17 @@ int main(int argc, char **argv)
 			uint8_t total = (UL + UM + UR +
 							 ML + MM + MR +
 							 BL + BM + BR);
+			printf("%d %d %d %d %d %d %d %d %d => %d\n", UL, UM, UR, ML, MM, MR, BL, BM, BR, total);
 			if (total == q) {
 				p_count++;
 			}
 		}
 	}
+	printf("count for rank %d: %d\n", rank, p_count);
 
 	// TODO: reduce all of the local results to a single
 	// overall result, report it (hint: MPI_Reduce)
-	MPI_Reduce(&p_count, &global_count, 1, MPI_INTEGER, MPI_SUM, 0, MPI_COMM_WORLD);
+	MPI_Reduce(&p_count, &global_count, 1, MPI_CHAR, MPI_SUM, 0, MPI_COMM_WORLD);
 
 	if (rank == 0) {
 		printf("Result is %d\n", global_count);
