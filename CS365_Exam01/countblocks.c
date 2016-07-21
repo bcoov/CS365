@@ -114,7 +114,11 @@ int main(int argc, char **argv)
 
 	// TODO: reduce all of the local results to a single
 	// overall result, report it (hint: MPI_Reduce)
-	MPI_Reduce(&p_count, &global_count, 1, MPI_INTEGER, NULL, 0, MPI_COMM_WORLD);
+	MPI_Reduce(&p_count, &global_count, 1, MPI_INTEGER, MPI_SUM, 0, MPI_COMM_WORLD);
+
+	if (rank == 0) {
+		printf("Result is %d\n", global_count);
+	}
 
 	MPI_Finalize();
 
