@@ -46,6 +46,7 @@ typedef struct {
 	// Thread struct members
 	pthread_mutex_t lock;
 	pthread_cond_t cond;
+	bool recompute;
 } NBody;
 
 // ----------------------------------------------------------------------
@@ -116,6 +117,7 @@ void nbody_init(NBody *sim)
 {
 	sim->particles = malloc(NUM * sizeof(Particle));
 	sim->num_particles = NUM;
+	sim->recompute = false;
 
 	for (int i = 0; i < NUM; i++) {
 		particle_init_rand(&sim->particles[i]);
@@ -123,6 +125,12 @@ void nbody_init(NBody *sim)
 
 	pthread_mutex_init(&sim->lock, NULL);
 	pthread_cond_init(&sim->cond, NULL);
+
+	// TODO: What function are the threads using for their work?
+	// nbody_tick(), or a new one that uses nbody_tick()?
+	for (int i = 0; i < NUM_THREADS; ++i) {
+		pthread_create(&workers[i], NULL, WORKER_FUNC, sim);
+	}
 }
 
 void nbody_destroy(NBody *sim)
