@@ -46,7 +46,8 @@ typedef struct {
 	// Thread struct members
 	pthread_mutex_t lock;
 	pthread_cond_t cond;
-	bool recompute;
+	bool time_to_work;
+	bool work_done;
 } NBody;
 
 // ----------------------------------------------------------------------
@@ -117,7 +118,8 @@ void nbody_init(NBody *sim)
 {
 	sim->particles = malloc(NUM * sizeof(Particle));
 	sim->num_particles = NUM;
-	sim->recompute = false;
+	sim->time_to_work = false;
+	sim->work_done = true;
 
 	for (int i = 0; i < NUM; i++) {
 		particle_init_rand(&sim->particles[i]);
@@ -142,6 +144,9 @@ void nbody_destroy(NBody *sim)
 void nbody_tick(NBody *sim)
 {
 	//printf("Tick\n");
+	sim->time_to_work = true;
+	sim->work_done = false;
+	pthread_cond_broadcast(&sim->cond);
 
 	// Simulate the force on each particle due to the gravitational attraction
 	// to all of other particles, and update each particle's velocity accordingly.
