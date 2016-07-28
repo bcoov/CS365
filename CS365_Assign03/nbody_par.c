@@ -162,6 +162,11 @@ void nbody_tick(NBody *sim)
 	for (int i = 0; i < sim->num_particles; i++) {
 		particle_update_position(&sim->particles[i]);
 	}
+
+	// Wait until work is finished
+	while (!sim->work_done) {
+		pthread_cond_wait(&sim->cond, &sim->lock);
+	}
 }
 
 // ----------------------------------------------------------------------
