@@ -44,10 +44,11 @@ typedef struct {
 	int num_particles;
 
 	// Thread struct members
-	pthread_mutex_t lock;
-	pthread_cond_t cond;
-	bool time_to_work;
-	bool work_done;
+	// pthread_mutex_t lock;
+	// pthread_cond_t cond;
+	// bool time_to_work;
+	// bool work_done;
+	// Use mtqueue
 } NBody;
 
 // ----------------------------------------------------------------------
@@ -129,7 +130,8 @@ void nbody_init(NBody *sim)
 	pthread_cond_init(&sim->cond, NULL);
 
 	// TODO: What function are the threads using for their work?
-	// nbody_tick(), or a new one that uses nbody_tick()?
+	// particle_compute_attraction <-- (new function)
+	// 		Wait for queue to have items in it (Range)
 	for (int i = 0; i < NUM_THREADS; ++i) {
 		pthread_create(&workers[i], NULL, WORKER_FUNC, sim);
 	}
@@ -148,6 +150,7 @@ void nbody_tick(NBody *sim)
 	sim->work_done = false;
 	pthread_cond_broadcast(&sim->cond);
 
+	// TODO: Replace this set of loops with parallelized stuff
 	// Simulate the force on each particle due to the gravitational attraction
 	// to all of other particles, and update each particle's velocity accordingly.
 	for (int i = 0; i < sim->num_particles; i++) {
@@ -158,14 +161,15 @@ void nbody_tick(NBody *sim)
 		}
 	}
 
+	// Wait until work is finished
+	// while (!sim->work_done) {
+	// 	pthread_cond_wait(&sim->cond, &sim->lock);
+	// }
+	// Dequeue includes wait (for loop here)
+
 	// Based on each particle's velocity, update its position.
 	for (int i = 0; i < sim->num_particles; i++) {
 		particle_update_position(&sim->particles[i]);
-	}
-
-	// Wait until work is finished
-	while (!sim->work_done) {
-		pthread_cond_wait(&sim->cond, &sim->lock);
 	}
 }
 
