@@ -5,6 +5,7 @@
 #include <math.h>
 #include <pthread.h>
 #include <forms.h>
+#include "mtqueue.h"
 
 // ----------------------------------------------------------------------
 
@@ -38,14 +39,20 @@ typedef struct {
 	int color;
 } Particle;
 
+// Struct type representing a range of particles
+typedef struct {
+	int start;
+	int end;
+} Range;
+
 // Struct type representing the overall simulation
 typedef struct {
 	Particle *particles;
 	int num_particles;
 
-	// Thread struct members
-	pthread_mutex_t lock;
-	pthread_cond_t cond;
+	Range * part_range;
+	MTQueue * work_q;
+	MTQueue * done_q;
 } NBody;
 
 // ----------------------------------------------------------------------
@@ -110,6 +117,28 @@ void particle_update_position(Particle *p)
 	p->y += (p->dy * .01);
 }
 
+//
+// Compute the particle attraction for a range of particles.
+// (Parallel version)
+//
+void * particle_range_comp(void * t_arg)
+{
+	NBody * sim = t_arg;
+
+	while (1) {
+		Range * sim_range = mtqueue_dequeue(sim->work_q);
+
+		for (int i = sim_range->start; i < sim_range->end; i++) {
+			for (int j = sim_range->start; j < sim_range->end; j++) {
+				if (i != j) {
+					particle_compute_attraction(&sim->particles[i],
+												&sim->particles[j]);
+				}
+			}
+		}
+	}
+}
+
 // ----------------------------------------------------------------------
 
 void nbody_init(NBody *sim)
@@ -121,8 +150,15 @@ void nbody_init(NBody *sim)
 		particle_init_rand(&sim->particles[i]);
 	}
 
-	pthread_mutex_init(&sim->lock, NULL);
-	pthread_cond_init(&sim->cond, NULL);
+	sim->work_q = mtqueue_create();
+	sim->done_q = mtqueue_create();
+
+	for (int i = 0; i < NUM_THREADS; ++i) {
+		int chunk_size = NUM / NUM_THREADS;
+		sim->part_range.start = 0 + (i * chunk_size);
+		sim->part_range.end = sim->part_range.start + (i + 1) * chunk_size;
+		pthread_create(&workers[i], NULL, particle_range_comp, sim);
+	}
 }
 
 void nbody_destroy(NBody *sim)
@@ -137,13 +173,23 @@ void nbody_tick(NBody *sim)
 
 	// Simulate the force on each particle due to the gravitational attraction
 	// to all of other particles, and update each particle's velocity accordingly.
-	for (int i = 0; i < sim->num_particles; i++) {
-		for (int j = 0; j < sim->num_particles; j++) {
-			if (i != j) {
-				particle_compute_attraction(&sim->particles[i], &sim->particles[j]);
-			}
-		}
-	}
+	// for (int i = 0; i < sim->num_particles; i++) {
+	// 	for (int j = 0; j < sim->num_particles; j++) {
+	// 		if (i != j) {
+	// 			particle_compute_attraction(&sim->particles[i], &sim->particles[j]);
+	// 		}
+	// 	}
+	// }
+
+	mtqueue_enqueue(sim->work_q, sim->part_range);
+
+	// Wait until work is finished
+	// while (!sim->work_done) {
+	// 	pthread_cond_wait(&sim->cond, &sim->lock);
+	// }
+	// Dequeue includes wait (for loop here)
+
+	mtqueue_dequeue(sim->done_q);
 
 	// Based on each particle's velocity, update its position.
 	for (int i = 0; i < sim->num_particles; i++) {
