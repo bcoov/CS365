@@ -1,4 +1,4 @@
-SRCS = nbody_seq.c nbody_par.c
+SRCS = nbody_seq.c nbody_par.c mtqueue.h mtqueue.c
 PROGS = $(SRCS:%.c=%)
 
 CFLAGS = -g -Wall -std=gnu99 -D_REENTRANT
@@ -61,7 +61,7 @@ collected-files.txt :
 nonexistent :
 
 clean :
-	rm -f nbody *.o *~ depend.mak
+	rm -f nbody nbody_seq *.o *~ depend.mak
 
 depend.mak :
 	touch $@
