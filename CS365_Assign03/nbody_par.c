@@ -29,7 +29,7 @@
 #define HEIGHT 10000.0
 
 #define NUM_THREADS 4
-pthread_t * workers;
+pthread_t workers[NUM_THREADS];
 
 // Struct type representing a single particle
 typedef struct {
