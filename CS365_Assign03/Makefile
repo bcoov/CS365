@@ -1,5 +1,5 @@
-SRCS = nbody_seq.c nbody_par.c mtqueue.h mtqueue.c
-PROGS = $(SRCS:%.c=%)
+SRCS = nbody_seq.c nbody_par.c mtqueue.c
+PROGS = nbody_seq nbody_par
 
 CFLAGS = -g -Wall -std=gnu99 -D_REENTRANT
 
@@ -16,8 +16,8 @@ all : $(PROGS)
 nbody_seq : nbody_seq.o
 	$(CC) -o nbody_seq nbody_seq.o -lforms -lpthread -lm
 
-nbody_par : nbody_par.o
-	$(CC) -o nbody_par nbody_par.o -lforms -lpthread -lm
+nbody_par : nbody_par.o mtqueue.o
+	$(CC) -o nbody_par nbody_par.o mtqueue.o -lforms -lpthread -lm
 
 submit : submit.properties solution.zip
 	perl submitToMarmoset.pl solution.zip submit.properties
