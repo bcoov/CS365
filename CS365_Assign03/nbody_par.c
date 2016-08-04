@@ -157,6 +157,7 @@ void nbody_init(NBody *sim)
 	printf("Creating threads\n");
 	for (int i = 0; i < NUM_THREADS; ++i) {
 		int chunk_size = NUM / NUM_THREADS;
+		printf("Sim parts for thread #%d\n");
 		sim->part_range->start = 0 + (i * chunk_size);
 		sim->part_range->end = sim->part_range->start + (i + 1) * chunk_size;
 		printf("Thread #%d\n", i);
