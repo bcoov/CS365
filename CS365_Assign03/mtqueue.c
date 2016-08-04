@@ -17,9 +17,12 @@ MTQueue *mtqueue_create(void)
 
 void mtqueue_enqueue(MTQueue *q, void *item)
 {
+	printf("Enqueueing onto %p\n", q);
+
 	MTQueueNode * new_node = malloc(sizeof(MTQueueNode));
     new_node->item = item;
     new_node->next = NULL;
+	printf("enqueue: new_node=%p\n", new_node);
 
     pthread_mutex_lock(&q->lock);
 
@@ -32,6 +35,8 @@ void mtqueue_enqueue(MTQueue *q, void *item)
     	q->tail = new_node;
 	}
     pthread_cond_broadcast(&q->cond);
+
+	printf("After enqueue: q=%p, head=%p, tail=%p\n", q, q->head, q->tail);
 
     pthread_mutex_unlock(&q->lock);
 }

@@ -50,7 +50,7 @@ typedef struct {
 	Particle *particles;
 	int num_particles;
 
-	Range part_range;
+	//Range * part_range;
 	MTQueue * work_q;
 	MTQueue * done_q;
 } NBody;
@@ -129,13 +129,14 @@ void * particle_range_comp(void * t_arg)
 		Range * sim_range = mtqueue_dequeue(sim->work_q);
 
 		for (int i = sim_range->start; i < sim_range->end; i++) {
-			for (int j = sim_range->start; j < sim_range->end; j++) {
+			for (int j = 0; j < sim->num_particles; j++) {// should be all
 				if (i != j) {
 					particle_compute_attraction(&sim->particles[i],
 												&sim->particles[j]);
 				}
 			}
 		}
+		mtqueue_enqueue(sim->done_q, sim_range);
 	}
 }
 
@@ -152,16 +153,16 @@ void nbody_init(NBody *sim)
 	}
 
 	sim->work_q = mtqueue_create();
+	printf("Created work queue %p\n", sim->work_q);
 	sim->done_q = mtqueue_create();
+	printf("Created done queue %p\n", sim->done_q);
+
+	printf("Work queue head=%p, tail=%p\n", sim->work_q->head, sim->work_q->tail);
+
+	workers = malloc(NUM_THREADS * sizeof(pthread_t));
 
 	printf("Creating threads\n");
 	for (int i = 0; i < NUM_THREADS; ++i) {
-		int chunk_size = NUM / NUM_THREADS;
-		printf("Sim part_range start for thread #%d\n", i);
-		sim->part_range.start = 0 + (i * chunk_size);
-		printf("Sim part_range end for thread #%d\n", i);
-		sim->part_range.end = sim->part_range.start + (i + 1) * chunk_size;
-		printf("Thread #%d\n", i);
 		pthread_create(&workers[i], NULL, particle_range_comp, sim);
 	}
 	printf("Init done\n");
@@ -187,17 +188,24 @@ void nbody_tick(NBody *sim)
 	// 	}
 	// }
 
-	printf("Enqueueing\n");
-	mtqueue_enqueue(sim->work_q, *sim->part_range);
+	for (int i = 0; i < NUM_THREADS; ++i) {
+		int chunk_size = NUM / NUM_THREADS;
+		Range * range = malloc(sizeof(Range));
+		range->start = 0 + (i * chunk_size);
+		range->end = range->start + chunk_size;
+
+		printf("Enqueueing #%d\n", i);
+		mtqueue_enqueue(sim->work_q, range);
+	}
 
 	// Wait until work is finished
-	// while (!sim->work_done) {
-	// 	pthread_cond_wait(&sim->cond, &sim->lock);
-	// }
 	// Dequeue includes wait (for loop here)
 
-	printf("Dequeueing\n");
-	mtqueue_dequeue(sim->done_q);
+	for (int i = 0; i < NUM_THREADS; ++i) {
+		printf("Dequeueing #%d\n", i);
+		Range *range = mtqueue_dequeue(sim->done_q);
+		// could free range
+	}
 
 	// Based on each particle's velocity, update its position.
 	printf("Updating\n");

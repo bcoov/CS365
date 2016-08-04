@@ -117,27 +117,7 @@ my $submitURL = $properties{'submitURL'};
 delete $properties{'submitURL'};
 
 
-#
-# YUCK: curl 7.18.2 doesn't work unless -sslv3 is hard-coded.
-# Earlier versions of curl don't seem to work if that option is used.
-# So, test the version explicitly.  Sigh.
-#
-
-my $curl_version = `curl --version 2>&1`;
-if (! ($curl_version =~ /^curl (\d+)\.(\d+)\.(\d+)/)) {
-	die "The curl program does not seem to be available: curl --version output: $curl_version\n";
-}
-my $curl_major = $1;
-my $curl_minor = $2;
-my $curl_patch = $3;
-
-my $sslv3_opt = '';
-if ($curl_major > 7 ||
-	($curl_major == 7 && ($curl_minor > 18 || ($curl_minor == 18 && $curl_patch >= 2)))) {
-	$sslv3_opt = '--sslv3';
-}
-
-my $cmd = "curl --insecure $sslv3_opt -F 'submittedFiles=\@${fileName}'";
+my $cmd = "curl -F 'submittedFiles=\@${fileName}'";
 for my $key (sort keys %properties) {
 	my $value = $properties{$key};
 	$cmd .= " -F '$key=$value'";
