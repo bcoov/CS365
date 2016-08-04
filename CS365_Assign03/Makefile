@@ -61,7 +61,7 @@ collected-files.txt :
 nonexistent :
 
 clean :
-	rm -f nbody nbody_seq *.o *~ depend.mak
+	rm -f nbody nbody_par nbody_seq *.o *~ depend.mak
 
 depend.mak :
 	touch $@
