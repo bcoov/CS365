@@ -29,7 +29,7 @@
 #define HEIGHT 10000.0
 
 #define NUM_THREADS 4
-pthread_t workers[NUM_THREADS];
+pthread_t * workers;
 
 // Struct type representing a single particle
 typedef struct {
@@ -50,7 +50,7 @@ typedef struct {
 	Particle *particles;
 	int num_particles;
 
-	Range * part_range;
+	Range part_range;
 	MTQueue * work_q;
 	MTQueue * done_q;
 } NBody;
@@ -158,9 +158,9 @@ void nbody_init(NBody *sim)
 	for (int i = 0; i < NUM_THREADS; ++i) {
 		int chunk_size = NUM / NUM_THREADS;
 		printf("Sim part_range start for thread #%d\n", i);
-		sim.part_range->start = 0 + (i * chunk_size);
+		sim->part_range->start = 0 + (i * chunk_size);
 		printf("Sim part_range end for thread #%d\n", i);
-		sim.part_range->end = sim.part_range->start + (i + 1) * chunk_size;
+		sim->part_range->end = sim->part_range->start + (i + 1) * chunk_size;
 		printf("Thread #%d\n", i);
 		pthread_create(&workers[i], NULL, particle_range_comp, sim);
 	}
