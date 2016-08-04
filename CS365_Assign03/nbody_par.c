@@ -169,7 +169,7 @@ void nbody_destroy(NBody *sim)
 
 void nbody_tick(NBody *sim)
 {
-	//printf("Tick\n");
+	printf("Tick\n");
 
 	// Simulate the force on each particle due to the gravitational attraction
 	// to all of other particles, and update each particle's velocity accordingly.
@@ -181,6 +181,7 @@ void nbody_tick(NBody *sim)
 	// 	}
 	// }
 
+	printf("Enqueueing\n");
 	mtqueue_enqueue(sim->work_q, sim->part_range);
 
 	// Wait until work is finished
@@ -189,9 +190,11 @@ void nbody_tick(NBody *sim)
 	// }
 	// Dequeue includes wait (for loop here)
 
+	printf("Dequeueing\n");
 	mtqueue_dequeue(sim->done_q);
 
 	// Based on each particle's velocity, update its position.
+	printf("Updating\n");
 	for (int i = 0; i < sim->num_particles; i++) {
 		particle_update_position(&sim->particles[i]);
 	}
