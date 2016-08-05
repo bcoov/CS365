@@ -129,7 +129,7 @@ void * particle_range_comp(void * t_arg)
 		Range * sim_range = mtqueue_dequeue(sim->work_q);
 
 		for (int i = sim_range->start; i < sim_range->end; i++) {
-			for (int j = 0; j < sim->num_particles; j++) {// should be all
+			for (int j = 0; j < sim->num_particles; j++) {
 				if (i != j) {
 					particle_compute_attraction(&sim->particles[i],
 												&sim->particles[j]);
@@ -144,7 +144,6 @@ void * particle_range_comp(void * t_arg)
 
 void nbody_init(NBody *sim)
 {
-	printf("Initializing\n");
 	sim->particles = malloc(NUM * sizeof(Particle));
 	sim->num_particles = NUM;
 
@@ -152,20 +151,16 @@ void nbody_init(NBody *sim)
 		particle_init_rand(&sim->particles[i]);
 	}
 
+	// Prep queues
 	sim->work_q = mtqueue_create();
-	printf("Created work queue %p\n", sim->work_q);
 	sim->done_q = mtqueue_create();
-	printf("Created done queue %p\n", sim->done_q);
-
-	printf("Work queue head=%p, tail=%p\n", sim->work_q->head, sim->work_q->tail);
-
+	// Allocate memory for workers
 	workers = malloc(NUM_THREADS * sizeof(pthread_t));
 
-	printf("Creating threads\n");
+	// Create threads
 	for (int i = 0; i < NUM_THREADS; ++i) {
 		pthread_create(&workers[i], NULL, particle_range_comp, sim);
 	}
-	printf("Init done\n");
 }
 
 void nbody_destroy(NBody *sim)
@@ -176,7 +171,7 @@ void nbody_destroy(NBody *sim)
 
 void nbody_tick(NBody *sim)
 {
-	printf("Tick\n");
+	//printf("Tick\n");
 
 	// Simulate the force on each particle due to the gravitational attraction
 	// to all of other particles, and update each particle's velocity accordingly.
@@ -194,7 +189,6 @@ void nbody_tick(NBody *sim)
 		range->start = 0 + (i * chunk_size);
 		range->end = range->start + chunk_size;
 
-		printf("Enqueueing #%d\n", i);
 		mtqueue_enqueue(sim->work_q, range);
 	}
 
@@ -202,13 +196,11 @@ void nbody_tick(NBody *sim)
 	// Dequeue includes wait (for loop here)
 
 	for (int i = 0; i < NUM_THREADS; ++i) {
-		printf("Dequeueing #%d\n", i);
 		Range *range = mtqueue_dequeue(sim->done_q);
-		// could free range
+		free(range);
 	}
 
 	// Based on each particle's velocity, update its position.
-	printf("Updating\n");
 	for (int i = 0; i < sim->num_particles; i++) {
 		particle_update_position(&sim->particles[i]);
 	}
